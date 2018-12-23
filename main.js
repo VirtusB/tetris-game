@@ -1,143 +1,118 @@
-const canvas = document.getElementById('tetris');
-const context = canvas.getContext('2d');
+const tetri = [];
 
-context.scale(20, 20);
+const playerElements = document.getElementsByClassName('player');
+Array.from(playerElements).forEach(el => {
+    const tetris = new Tetris(el);
+    tetri.push(tetris);
+});
 
+const keyListener = (event) => {
+    const code = event.keyCode || event.which;
 
+    const playerOneMap = [65, 68, 81, 69, 83];
+    const playerTwoMap = [72, 75, 89, 73, 74];
 
+    const combined = playerOneMap.concat(playerTwoMap);
 
-
-
-
-
-
-
-function createPiece(type) {
-    switch (type) {
-        case 'T':
-            return [
-                [0, 0, 0],
-                [1, 1, 1],
-                [0, 1, 0]
-            ];
-        case 'O':
-            return [
-                [2, 2],
-                [2, 2]
-            ];4
-        case 'L':
-            return [
-                [0, 3, 0],
-                [0, 3, 0],
-                [0, 3, 3]
-            ];
-        case 'J':
-            return [
-                [0, 4, 0],
-                [0, 4, 0],
-                [4, 4, 0]
-            ];
-        case 'I':
-            return [
-                [0, 5, 0, 0],
-                [0, 5, 0, 0],
-                [0, 5, 0, 0],
-                [0, 5, 0, 0]
-            ];
-        case 'S':
-            return [
-                [0, 6, 6],
-                [6, 6, 0],
-                [0, 0, 0]
-            ];
-        case 'Z':
-            return [
-                [7, 7, 0],
-                [0, 7, 7],
-                [0, 0, 0]
-            ];
+    if (!in_array(code, combined)) {
+        return;
     }
-}
 
-function draw() {
-    context.fillStyle = '#000';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    let index = null;
 
-    drawMatrix(arena.matrix, {x: 0, y: 0});
-    drawMatrix(player.matrix, player.pos);
-}
+    if (in_array(code, playerOneMap)) {
+        index = 0;
+    } else {
+        index = 1;
+    }
 
-function drawMatrix(matrix, offset) {
-    matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                context.fillStyle = colors[value];
-                context.fillRect(x + offset.x, y + offset.y, 1, 1);
+
+    let actions = [];
+    actions["move_left"] = [65, 72, -1];
+    actions["move_right"] = [68, 75, 1];
+    actions["rotate_left"] = [81, 89, 1];
+    actions["rotate_right"] = [69, 73, -1];
+    actions["drop"] = [83, 74, 1];
+
+    actions = Object.entries(actions).map(([key, value]) => ({key,value}));
+
+
+    let action = null;
+    actions.forEach((act) => {
+        act.value.forEach(val => {
+            if (val === code) {
+                action = [act.key, act.value];
             }
         });
     });
-}
 
 
+    let functions = [];
+    functions["move_left"] = tetri[index];
+    functions["move_right"] = tetri[index];
+    functions["rotate_left"] = tetri[index];
+    functions["rotate_right"] = tetri[index];
+    functions["drop"] = tetri[index];
 
 
+    functions = Object.entries(functions).map(([key, value]) => ({key,value}));
+    functions.forEach(func => {
+        if (action[0] === func.key && event.type === 'keydown') {
+            switch (func.key) {
+                case 'move_left':
+                    func.value.player.move(-1);
+                    break;
+                case 'move_right':
+                    func.value.player.move(1);
+                    break;
+                case 'rotate_left':
+                    func.value.player.rotate(-1);
+                    break;
+                case 'rotate_right':
+                    func.value.player.rotate(1);
+                    break;
+            }
 
-let lastTime = 0;
-function update(time = 0) {
-    const deltaTime = time - lastTime;
-    lastTime = time;
+        }
 
-    player.update(deltaTime);
+        if (action[0] === func.key && func.key === 'drop') {
+            if (event.type === 'keydown' && func.value.player.dropInterval !== func.value.player.DROP_FAST) {
+                func.value.player.drop();
+                func.value.player.dropInterval = func.value.player.DROP_FAST;
+            } else {
+                func.value.player.dropInterval = func.value.player.DROP_SLOW;
 
-    draw();
-    requestAnimationFrame(update);
-}
+            }
+        }
 
-function updateScore() {
-    document.getElementById('score').innerText = player.score;
-}
+    });
 
-const colors = [
-    null,
-    '#FF0D72',
-    '#0DC2FF',
-    '#0DFF72',
-    '#F538FF',
-    '#FF8E0D',
-    '#FFE138',
-    '#3877FF',
-];
+    // 65 A move left
+    // 68 D move right
+    // 81 Q rotate
+    // 69 E rotate
+    // 83 S drop
 
-const arena = new Arena(12, 20);
+    // 72 H move left
+    // 75 K move right
+    // 89 Y rotate
+    // 73 I rotate
+    // 74 J drop
+};
 
-const player = new Player();
+document.addEventListener('keydown', keyListener);
+document.addEventListener('keyup', keyListener);
 
-
-document.addEventListener('keydown', event => {
-    const code = event.keyCode || event.which;
-
-    switch (code) {
-        case 37:
-            player.move(-1);
-            break;
-        case 39:
-            player.move(1);
-            break;
-        case 40:
-            player.drop();
-            break;
-        case 81:
-            player.rotate(-1);
-            break;
-        case 87:
-            player.rotate(1);
-            break;
+function in_array(needle, haystack) {
+    const length = haystack.length;
+    for(let i = 0; i < length; i++) {
+        if(haystack[i] === needle) return true;
     }
-});
+    return false;
+}
 
 
-player.reset();
-update();
+
 
 
 
