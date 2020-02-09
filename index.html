@@ -7,21 +7,21 @@
 </head>
 <body>
 
-<div class="player">
-    <div class="score">0</div>
-    <canvas class="tetris" width="240" height="400"></canvas>
-</div>
-
-<div class="player">
-    <div class="score">0</div>
-    <canvas class="tetris" width="240" height="400"></canvas>
-</div>
+<template id="player-template">
+    <div class="player">
+        <div class="score">0</div>
+        <canvas class="tetris" width="240" height="400"></canvas>
+    </div>
+</template>
 
 
 
-<script src="Arena.js"></script>
-<script src="Player.js"></script>
-<script src="Tetris.js"></script>
-<script src="main.js"></script>
+
+<script src="client/TetrisManager.js"></script>
+<script src="client/ConnectionManager.js"></script>
+<script src="client/Arena.js"></script>
+<script src="client/Player.js"></script>
+<script src="client/Tetris.js"></script>
+<script src="client/main.js"></script>
 </body>
 </html>

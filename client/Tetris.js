@@ -1,7 +1,7 @@
 class Tetris {
-    constructor(el) {
-        this.element = el;
-        this.canvas = el.getElementsByTagName('canvas')[0];
+    constructor(element) {
+        this.element = element;
+        this.canvas = element.getElementsByTagName('canvas')[0];
 
         this.context = this.canvas.getContext('2d');
         this.context.scale(20, 20);
@@ -22,17 +22,16 @@ class Tetris {
 
 
         let lastTime = 0;
-        const update = (time = 0) => {
+         this._update = (time = 0) => {
             const deltaTime = time - lastTime;
             lastTime = time;
 
             this.player.update(deltaTime);
 
             this.draw();
-            requestAnimationFrame(update);
+            requestAnimationFrame(this._update);
         };
-
-        update();
+         // maybe updateScore ?
     }
 
     draw() {
@@ -52,6 +51,10 @@ class Tetris {
                 }
             });
         });
+    }
+
+    run() {
+        this._update();
     }
 
     updateScore(score) {

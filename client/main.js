@@ -1,10 +1,10 @@
-const tetri = [];
+const tetrisManager = new TetrisManager(document);
+const localTetris = tetrisManager.createPlayer();
+localTetris.element.classList.add('local');
+localTetris.run();
 
-const playerElements = document.getElementsByClassName('player');
-Array.from(playerElements).forEach(el => {
-    const tetris = new Tetris(el);
-    tetri.push(tetris);
-});
+const connectionManager = new ConnectionManager(tetrisManager);
+connectionManager.connect('ws://127.0.0.1:9000');
 
 const keyListener = (event) => {
     const code = event.keyCode || event.which;
@@ -48,14 +48,15 @@ const keyListener = (event) => {
 
 
     let functions = [];
-    functions["move_left"] = tetri[index];
-    functions["move_right"] = tetri[index];
-    functions["rotate_left"] = tetri[index];
-    functions["rotate_right"] = tetri[index];
-    functions["drop"] = tetri[index];
+    functions["move_left"] = localTetris;
+    functions["move_right"] = localTetris;
+    functions["rotate_left"] = localTetris;
+    functions["rotate_right"] = localTetris;
+    functions["drop"] = localTetris;
 
 
     functions = Object.entries(functions).map(([key, value]) => ({key,value}));
+
     functions.forEach(func => {
         if (action[0] === func.key && event.type === 'keydown') {
             switch (func.key) {
